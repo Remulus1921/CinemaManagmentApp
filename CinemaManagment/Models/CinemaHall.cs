@@ -6,6 +6,8 @@
         public bool IsTaken { get; set; }
         public int HallNr { get; set; }
         public int NrOfSeats { get; set; }
-        public Seat[] SeatsInHall { get; set; }
+
+        //Navigation properties
+        public Show? Show { get; set; }
     }
 }
