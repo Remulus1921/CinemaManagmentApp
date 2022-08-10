@@ -6,5 +6,8 @@
         public string Title { get; set; }
         public string Director { get; set; }
         public int MovieLenght { get; set; }
+
+        //Navigation properties
+        public Show? Show { get; set; }
     }
 }
