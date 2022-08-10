@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using CinemaManagment.Models;
 
 namespace CinemaManagment.Areas.Identity.Data;
 
@@ -21,6 +22,16 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         // Add your customizations after calling base.OnModelCreating(builder);
         builder.ApplyConfiguration(new ApplicationUserEntityConfiguration());
     }
+
+    public DbSet<CinemaManagment.Models.Movie>? Movie { get; set; }
+
+    public DbSet<CinemaManagment.Models.Show>? Show { get; set; }
+
+    public DbSet<CinemaManagment.Models.Reservation>? Reservation { get; set; }
+
+    public DbSet<CinemaManagment.Models.CinemaHall>? CinemaHall { get; set; }
+
+    public DbSet<CinemaManagment.Models.Seat>? Seat { get; set; }
 }
 
 internal class ApplicationUserEntityConfiguration : IEntityTypeConfiguration<ApplicationUser>
