@@ -4,6 +4,7 @@ using CinemaManagment.Areas.Identity.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CinemaManagment.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220810105127_DbReperation")]
+    partial class DbReperation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -114,6 +116,9 @@ namespace CinemaManagment.Migrations
                     b.Property<int>("NrOfSeats")
                         .HasColumnType("int");
 
+                    b.Property<int>("SeatId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.ToTable("CinemaHall");
@@ -159,8 +164,7 @@ namespace CinemaManagment.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ShowId")
-                        .IsUnique();
+                    b.HasIndex("ShowId");
 
                     b.ToTable("Reservation");
                 });
@@ -173,6 +177,9 @@ namespace CinemaManagment.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<int>("CinemaHallId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("IsTaken")
                         .HasColumnType("bit");
 
@@ -180,6 +187,8 @@ namespace CinemaManagment.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CinemaHallId");
 
                     b.ToTable("Seat");
                 });
@@ -352,12 +361,23 @@ namespace CinemaManagment.Migrations
             modelBuilder.Entity("CinemaManagment.Models.Reservation", b =>
                 {
                     b.HasOne("CinemaManagment.Models.Show", "Show")
-                        .WithOne("Reservation")
-                        .HasForeignKey("CinemaManagment.Models.Reservation", "ShowId")
+                        .WithMany("Reservation")
+                        .HasForeignKey("ShowId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Show");
+                });
+
+            modelBuilder.Entity("CinemaManagment.Models.Seat", b =>
+                {
+                    b.HasOne("CinemaManagment.Models.CinemaHall", "CinemaHall")
+                        .WithMany("SeatsInHall")
+                        .HasForeignKey("CinemaHallId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CinemaHall");
                 });
 
             modelBuilder.Entity("CinemaManagment.Models.Show", b =>
@@ -432,12 +452,16 @@ namespace CinemaManagment.Migrations
 
             modelBuilder.Entity("CinemaManagment.Models.CinemaHall", b =>
                 {
-                    b.Navigation("Show");
+                    b.Navigation("SeatsInHall");
+
+                    b.Navigation("Show")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("CinemaManagment.Models.Movie", b =>
                 {
-                    b.Navigation("Show");
+                    b.Navigation("Show")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("CinemaManagment.Models.Show", b =>
