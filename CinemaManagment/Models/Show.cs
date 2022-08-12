@@ -6,12 +6,11 @@
         public DateTime ShowStarts { get; set; }
 
         //Navigation properties
-        public List<Reservation?>? Reservation { get; set; }
         public int MovieId { get; set; }
-        public Movie? Movie { get; set; }
+        public Movie Movie { get; set; }
         public int CinemaHallId { get; set; }
-        public CinemaHall? Hall { get; set; }
-        
+        public CinemaHall Hall { get; set; }
+        public List<Reservation>? Reservation { get; set; }
 
     }
 }
