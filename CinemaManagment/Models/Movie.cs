@@ -8,6 +8,6 @@
         public int MovieLenght { get; set; }
 
         //Navigation properties
-        public Show? Show { get; set; }
+        public List<Show?>? Show { get; set; }
     }
 }
