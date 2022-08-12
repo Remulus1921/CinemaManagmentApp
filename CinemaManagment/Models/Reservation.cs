@@ -6,6 +6,6 @@
         public int CreatorId { get; set; }
         //Navigation Properties
         public int ShowId { get; set; }
-        public Show Show { get; set; }
+        public Show? Show { get; set; }
     }
 }
