@@ -4,6 +4,7 @@ using CinemaManagment.Areas.Identity.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CinemaManagment.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220812095032_CinemaHallIsTakenRemoved")]
+    partial class CinemaHallIsTakenRemoved
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -199,9 +201,11 @@ namespace CinemaManagment.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CinemaHallId");
+                    b.HasIndex("CinemaHallId")
+                        .IsUnique();
 
-                    b.HasIndex("MovieId");
+                    b.HasIndex("MovieId")
+                        .IsUnique();
 
                     b.ToTable("Show");
                 });
@@ -357,14 +361,14 @@ namespace CinemaManagment.Migrations
             modelBuilder.Entity("CinemaManagment.Models.Show", b =>
                 {
                     b.HasOne("CinemaManagment.Models.CinemaHall", "Hall")
-                        .WithMany("Show")
-                        .HasForeignKey("CinemaHallId")
+                        .WithOne("Show")
+                        .HasForeignKey("CinemaManagment.Models.Show", "CinemaHallId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("CinemaManagment.Models.Movie", "Movie")
-                        .WithMany("Show")
-                        .HasForeignKey("MovieId")
+                        .WithOne("Show")
+                        .HasForeignKey("CinemaManagment.Models.Show", "MovieId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
