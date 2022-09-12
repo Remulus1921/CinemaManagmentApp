@@ -191,8 +191,12 @@ namespace CinemaManagment.Migrations
                     b.Property<int>("CinemaHallId")
                         .HasColumnType("int");
 
-                    b.Property<int>("MovieId")
+                    b.Property<int?>("MovieId")
                         .HasColumnType("int");
+
+                    b.Property<string>("MovieTitle")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("ShowStarts")
                         .HasColumnType("datetime2");
@@ -364,9 +368,7 @@ namespace CinemaManagment.Migrations
 
                     b.HasOne("CinemaManagment.Models.Movie", "Movie")
                         .WithMany("Show")
-                        .HasForeignKey("MovieId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("MovieId");
 
                     b.Navigation("Hall");
 
