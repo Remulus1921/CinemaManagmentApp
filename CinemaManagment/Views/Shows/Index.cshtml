@@ -20,6 +20,9 @@
                 @Html.DisplayNameFor(model => model.Movie)
             </th>
             <th>
+                @Html.DisplayNameFor(model => model.Movie.MovieLenght)
+            </th>
+            <th>
                 @Html.DisplayNameFor(model => model.Hall)
             </th>
             <th></th>
@@ -32,7 +35,10 @@
                 @Html.DisplayFor(modelItem => item.ShowStarts)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Movie.Id)
+                @Html.DisplayFor(modelItem => item.Movie.Title)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Movie.MovieLenght)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Hall.Id)
