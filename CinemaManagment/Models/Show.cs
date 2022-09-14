@@ -7,6 +7,7 @@
 
         //Navigation properties
         public int MovieId { get; set; }
+        public string MovieTitle { get; set; }
         public Movie? Movie { get; set; }
         public int CinemaHallId { get; set; }
         public CinemaHall? Hall { get; set; }
