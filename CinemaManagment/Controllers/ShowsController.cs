@@ -50,7 +50,8 @@ namespace CinemaManagment.Controllers
         public IActionResult Create()
         {
             ViewData["CinemaHallId"] = new SelectList(_context.CinemaHall, "Id", "Id");
-            ViewData["MovieId"] = new SelectList(_context.Movie, "Id", "Id");
+            //ViewData["MovieId"] = new SelectList(_context.Movie, "Id", "Id");
+            ViewData["MovieTitle"] = new SelectList(_context.Movie, "Title", "Title");
             return View();
         }
 
@@ -59,8 +60,10 @@ namespace CinemaManagment.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,ShowStarts,MovieId,CinemaHallId")] Show show)
+        public async Task<IActionResult> Create([Bind("Id,ShowStarts,MovieId,MovieTitle,CinemaHallId")] Show show)
         {
+            var id = _context.Movie.Where(d => d.Title == show.MovieTitle).FirstOrDefault().Id;
+            show.MovieId = id;
             if (ModelState.IsValid)
             {
                 _context.Add(show);
@@ -68,7 +71,8 @@ namespace CinemaManagment.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewData["CinemaHallId"] = new SelectList(_context.CinemaHall, "Id", "Id", show.CinemaHallId);
-            ViewData["MovieId"] = new SelectList(_context.Movie, "Id", "Id", show.MovieId);
+            //ViewData["MovieId"] = new SelectList(_context.Movie, "Id", "Id", show.MovieId);
+            ViewData["MovieTitle"] = new SelectList(_context.Movie, "Title", "Title", show.MovieTitle);
             return View(show);
         }
 
@@ -86,6 +90,7 @@ namespace CinemaManagment.Controllers
                 return NotFound();
             }
             ViewData["CinemaHallId"] = new SelectList(_context.CinemaHall, "Id", "Id", show.CinemaHallId);
+            ViewData["MovieTitle"] = new SelectList(_context.Movie, "Title", "Title", show.MovieTitle);
             ViewData["MovieId"] = new SelectList(_context.Movie, "Id", "Id", show.MovieId);
             return View(show);
         }
@@ -95,8 +100,10 @@ namespace CinemaManagment.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,ShowStarts,MovieId,CinemaHallId")] Show show)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,ShowStarts,MovieId,MovieTitle,CinemaHallId")] Show show)
         {
+            var MId = _context.Movie.Where(d => d.Title == show.MovieTitle).FirstOrDefault().Id;
+            show.MovieId = MId;
             if (id != show.Id)
             {
                 return NotFound();
@@ -123,7 +130,8 @@ namespace CinemaManagment.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewData["CinemaHallId"] = new SelectList(_context.CinemaHall, "Id", "Id", show.CinemaHallId);
-            ViewData["MovieId"] = new SelectList(_context.Movie, "Id", "Id", show.MovieId);
+            ViewData["MovieTitle"] = new SelectList(_context.Movie, "Title", "Title", show.MovieTitle);
+            //ViewData["MovieId"] = new SelectList(_context.Movie, "Id", "Id", show.MovieId);
             return View(show);
         }
 
