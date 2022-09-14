@@ -1,6 +1,8 @@
+using CinemaManagment.Areas.Identity.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using CinemaManagment.Areas.Identity.Data;
+using Microsoft.AspNetCore.Authorization;
+
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("ApplicationDbContextConnection") ?? throw new InvalidOperationException("Connection string 'ApplicationDbContextConnection' not found.");
 
@@ -8,10 +10,32 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 
 builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
+    .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
+
+
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.Configure<IdentityOptions>(options =>
+{
+    options.Password.RequireDigit = true;
+    options.Password.RequireLowercase = true;
+    options.Password.RequireNonAlphanumeric = true;
+    options.Password.RequireUppercase = true;
+    options.Lockout.MaxFailedAccessAttempts = 3;
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(3);
+    options.Lockout.AllowedForNewUsers = true;
+    options.User.RequireUniqueEmail = true;
+});
+
+//builder.Services.AddAuthorization(options =>
+//{
+//    options.FallbackPolicy = new AuthorizationPolicyBuilder()
+//        .RequireAuthenticatedUser()
+//        .Build();
+//});
 
 var app = builder.Build();
 
@@ -27,8 +51,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-app.UseAuthentication();;
 
+app.UseAuthentication();;
 app.UseAuthorization();
 
 app.MapControllerRoute(
