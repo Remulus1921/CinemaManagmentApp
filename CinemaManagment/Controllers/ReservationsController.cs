@@ -7,13 +7,14 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CinemaManagment.Areas.Identity.Data;
 using CinemaManagment.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace CinemaManagment.Controllers
 {
     public class ReservationsController : Controller
     {
         private readonly ApplicationDbContext _context;
-
+        UserManager<IdentityUser> _userManager;
         public ReservationsController(ApplicationDbContext context)
         {
             _context = context;
@@ -59,6 +60,9 @@ namespace CinemaManagment.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,CreatorId,ShowId")] Reservation reservation)
         {
+            var id = _userManager.GetUserId(User);
+            reservation.CreatorId = id;
+
             if (ModelState.IsValid)
             {
                 _context.Add(reservation);
