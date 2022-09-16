@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CinemaManagment.Areas.Identity.Data;
 using CinemaManagment.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CinemaManagment.Controllers
 {
+    [Authorize]
     public class CinemaHallsController : Controller
     {
         private readonly ApplicationDbContext _context;

@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using CinemaManagment.Areas.Identity.Data;
 using CinemaManagment.Models;
 using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
 
 namespace CinemaManagment.Controllers
 {
@@ -60,17 +61,20 @@ namespace CinemaManagment.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,CreatorId,ShowId")] Reservation reservation)
         {
-            var id = _userManager.GetUserId(User);
-            reservation.CreatorId = id;
-
-            if (ModelState.IsValid)
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                throw new ArgumentException("Blad");
+            }
+            reservation.CreatorId = userId;
+            //if (ModelState.IsValid)
             {
                 _context.Add(reservation);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ShowId"] = new SelectList(_context.Show, "Id", "Id", reservation.ShowId);
-            return View(reservation);
+            //ViewData["ShowId"] = new SelectList(_context.Show, "Id", "Id", reservation.ShowId);
+            //return View(reservation);
         }
 
         // GET: Reservations/Edit/5
