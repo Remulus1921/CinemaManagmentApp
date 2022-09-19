@@ -4,6 +4,7 @@ using CinemaManagment.Areas.Identity.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CinemaManagment.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220919122220_AnyShowsAddedToCinemaHallModel")]
+    partial class AnyShowsAddedToCinemaHallModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -173,9 +175,6 @@ namespace CinemaManagment.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int>("CinemaHallId")
-                        .HasColumnType("int");
-
                     b.Property<bool>("IsTaken")
                         .HasColumnType("bit");
 
@@ -183,8 +182,6 @@ namespace CinemaManagment.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CinemaHallId");
 
                     b.ToTable("Seat");
                 });
@@ -365,17 +362,6 @@ namespace CinemaManagment.Migrations
                         .IsRequired();
 
                     b.Navigation("Show");
-                });
-
-            modelBuilder.Entity("CinemaManagment.Models.Seat", b =>
-                {
-                    b.HasOne("CinemaManagment.Models.CinemaHall", "CinemaHall")
-                        .WithMany()
-                        .HasForeignKey("CinemaHallId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CinemaHall");
                 });
 
             modelBuilder.Entity("CinemaManagment.Models.Show", b =>
