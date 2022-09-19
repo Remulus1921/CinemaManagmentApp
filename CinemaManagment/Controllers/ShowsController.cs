@@ -66,6 +66,43 @@ namespace CinemaManagment.Controllers
         {
             var id = _context.Movie.Where(d => d.Title == show.MovieTitle).FirstOrDefault().Id;
             show.MovieId = id;
+            if(_context.Show.Count() == 0)
+            {
+                foreach(var item in _context.CinemaHall)
+                {
+                    item.AnyShows = false;
+                }
+            }
+
+            var hall = _context.CinemaHall.Where(d => d.Id == show.CinemaHallId).FirstOrDefault().AnyShows;
+            if (hall)
+            {
+                //?
+                bool showOK = show.ShowStarts == _context.Show.Where(d => d.CinemaHallId == show.CinemaHallId).FirstOrDefault().ShowStarts;
+
+                var mId = _context.Show.Where(d => d.CinemaHallId == show.CinemaHallId).FirstOrDefault().MovieId;
+
+                bool nextShow = show.ShowStarts <= _context.Show.Where(d => d.CinemaHallId == show.CinemaHallId)
+                    .FirstOrDefault().ShowStarts
+                    .AddMinutes(_context.Movie.Where(m => m.Id == mId).FirstOrDefault().MovieLenght);
+
+                bool eShow = show.ShowStarts >= _context.Show.Where(d => d.CinemaHallId == show.CinemaHallId).FirstOrDefault().ShowStarts;
+
+                bool privShow = show.ShowStarts.AddMinutes(_context.Movie.
+                    Where(m => m.Id == show.MovieId).
+                    FirstOrDefault().MovieLenght) >= _context.Show.Where(d => d.CinemaHallId == show.CinemaHallId).FirstOrDefault().ShowStarts;
+
+                if (showOK || (nextShow && eShow) || privShow)
+                {
+                    Console.WriteLine("blad tworzenia seansu");
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+            else
+            {
+                _context.CinemaHall.Where(d => d.Id == show.CinemaHallId).FirstOrDefault().AnyShows = true;
+            }
+            
             if (ModelState.IsValid)
             {
                 _context.Add(show);
@@ -76,6 +113,7 @@ namespace CinemaManagment.Controllers
             //ViewData["MovieId"] = new SelectList(_context.Movie, "Id", "Id", show.MovieId);
             ViewData["MovieTitle"] = new SelectList(_context.Movie, "Title", "Title", show.MovieTitle);
             return View(show);
+
         }
 
         // GET: Shows/Edit/5
