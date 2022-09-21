@@ -68,11 +68,11 @@ namespace CinemaManagment.Controllers
             }
             reservation.CreatorId = userId;
             //if (ModelState.IsValid)
-            {
+            
                 _context.Add(reservation);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
-            }
+            
             //ViewData["ShowId"] = new SelectList(_context.Show, "Id", "Id", reservation.ShowId);
             //return View(reservation);
         }

@@ -13,9 +13,9 @@
 <table class="table">
     <thead>
         <tr>
-            @*<th>
+            <th>
                 @Html.DisplayNameFor(model => model.CreatorId)
-            </th>*@
+            </th>
             <th>
                 @Html.DisplayNameFor(model => model.Show)
             </th>
@@ -25,9 +25,9 @@
     <tbody>
 @foreach (var item in Model) {
         <tr>
-            @*<td>
+            <td>
                 @Html.DisplayFor(modelItem => item.CreatorId)
-            </td>*@
+            </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Show.ShowStarts)
             </td>
