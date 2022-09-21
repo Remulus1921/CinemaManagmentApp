@@ -63,7 +63,7 @@ namespace CinemaManagment.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,ShowStarts,MovieId,MovieTitle,CinemaHallId,HallNr")] Show show)
+        public async Task<IActionResult> Create([Bind("Id,ShowStarts,MovieId,MovieTitle,CinemaHallId,NrOfCinemaHall")] Show show)
         {
             var id = _context.Movie.Where(d => d.Title == show.MovieTitle).FirstOrDefault().Id;
             show.MovieId = id;
@@ -92,7 +92,7 @@ namespace CinemaManagment.Controllers
                     Where(m => m.Id == show.MovieId).
                     FirstOrDefault().MovieLenght) >= _context.Show.Where(d => d.CinemaHallId == show.CinemaHallId).FirstOrDefault().ShowStarts;
 
-                if (showOK || (nextShow && eShow) || privShow)
+                if (showOK || (nextShow && eShow) || (privShow && nextShow))
                 {
                     return RedirectToAction(nameof(Index));
                 }
@@ -108,7 +108,8 @@ namespace CinemaManagment.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CinemaHallId"] = new SelectList(_context.CinemaHall, "Id", "Id", show.CinemaHallId);
+            //ViewData["CinemaHallId"] = new SelectList(_context.CinemaHall, "Id", "Id", show.CinemaHallId);
+            ViewData["NrOfCinemaHall"] = new SelectList(_context.CinemaHall, "HallNr", "HallNr", show.NrOfCinemaHall);
             //ViewData["MovieId"] = new SelectList(_context.Movie, "Id", "Id", show.MovieId);
             ViewData["MovieTitle"] = new SelectList(_context.Movie, "Title", "Title", show.MovieTitle);
             return View(show);
