@@ -78,24 +78,28 @@ namespace CinemaManagment.Controllers
             var hall = _context.CinemaHall.Where(d => d.Id == show.CinemaHallId).FirstOrDefault().AnyShows;
             if (hall)
             {
-                bool showOK = show.ShowStarts == _context.Show.Where(d => d.CinemaHallId == show.CinemaHallId).FirstOrDefault().ShowStarts;
-
-                var mId = _context.Show.Where(d => d.CinemaHallId == show.CinemaHallId).FirstOrDefault().MovieId;
-
-                bool nextShow = show.ShowStarts <= _context.Show.Where(d => d.CinemaHallId == show.CinemaHallId)
-                    .FirstOrDefault().ShowStarts
-                    .AddMinutes(_context.Movie.Where(m => m.Id == mId).FirstOrDefault().MovieLenght);
-
-                bool eShow = show.ShowStarts >= _context.Show.Where(d => d.CinemaHallId == show.CinemaHallId).FirstOrDefault().ShowStarts;
-
-                bool privShow = show.ShowStarts.AddMinutes(_context.Movie.
-                    Where(m => m.Id == show.MovieId).
-                    FirstOrDefault().MovieLenght) >= _context.Show.Where(d => d.CinemaHallId == show.CinemaHallId).FirstOrDefault().ShowStarts;
-
-                if (showOK || (nextShow && eShow) || (privShow && nextShow))
+                foreach(var item in _context.Show.Where(d => d.CinemaHallId == show.CinemaHallId))
                 {
-                    return RedirectToAction(nameof(Index));
+                    bool showOK = show.ShowStarts == item.ShowStarts;
+
+                    var mId = item.MovieId;
+
+                    bool nextShow = show.ShowStarts <= item.ShowStarts
+                        .AddMinutes(_context.Movie.Where(m => m.Id == mId).FirstOrDefault().MovieLenght);
+
+                    bool eShow = show.ShowStarts >= item.ShowStarts;
+
+                    bool privShow = show.ShowStarts.AddMinutes(_context.Movie.
+                        Where(m => m.Id == show.MovieId).
+                        FirstOrDefault().MovieLenght) >= item.ShowStarts;
+
+                    if (showOK || (nextShow && eShow) || (privShow && nextShow))
+                    {
+                        return RedirectToAction(nameof(Index));
+                    }
                 }
+
+                
             }
             else
             {
