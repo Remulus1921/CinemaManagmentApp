@@ -51,7 +51,8 @@ namespace CinemaManagment.Controllers
         // GET: Shows/Create
         public IActionResult Create()
         {
-            ViewData["CinemaHallId"] = new SelectList(_context.CinemaHall, "Id", "Id");
+            //ViewData["CinemaHallId"] = new SelectList(_context.CinemaHall, "Id", "Id");
+            ViewData["NrOfCinemaHall"] = new SelectList(_context.CinemaHall, "HallNr", "HallNr");
             //ViewData["MovieId"] = new SelectList(_context.Movie, "Id", "Id");
             ViewData["MovieTitle"] = new SelectList(_context.Movie, "Title", "Title");
             return View();
@@ -62,12 +63,14 @@ namespace CinemaManagment.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,ShowStarts,MovieId,MovieTitle,CinemaHallId")] Show show)
+        public async Task<IActionResult> Create([Bind("Id,ShowStarts,MovieId,MovieTitle,CinemaHallId,HallNr")] Show show)
         {
             var id = _context.Movie.Where(d => d.Title == show.MovieTitle).FirstOrDefault().Id;
             show.MovieId = id;
+            var nr = _context.CinemaHall.Where(d => d.HallNr == show.NrOfCinemaHall).FirstOrDefault().Id;
+            show.CinemaHallId = nr;
 
-            if(show.ShowStarts < DateTime.Now)
+            if (show.ShowStarts < DateTime.Now)
             {
                 return RedirectToAction(nameof(Index));
             }
