@@ -4,6 +4,8 @@
     {
         public int Id { get; set; }
         public string CreatorId { get; set; }
+        public string CreatorFirstName { get; set; }
+        public string CreatorLastName { get; set; }
 
         //Navigation Properties
         public int ShowId { get; set; }
