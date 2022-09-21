@@ -66,18 +66,15 @@ namespace CinemaManagment.Controllers
         {
             var id = _context.Movie.Where(d => d.Title == show.MovieTitle).FirstOrDefault().Id;
             show.MovieId = id;
-            if(_context.Show.Count() == 0)
+
+            if(show.ShowStarts < DateTime.Now)
             {
-                foreach(var item in _context.CinemaHall)
-                {
-                    item.AnyShows = false;
-                }
+                return RedirectToAction(nameof(Index));
             }
 
             var hall = _context.CinemaHall.Where(d => d.Id == show.CinemaHallId).FirstOrDefault().AnyShows;
             if (hall)
             {
-                //?
                 bool showOK = show.ShowStarts == _context.Show.Where(d => d.CinemaHallId == show.CinemaHallId).FirstOrDefault().ShowStarts;
 
                 var mId = _context.Show.Where(d => d.CinemaHallId == show.CinemaHallId).FirstOrDefault().MovieId;
@@ -94,7 +91,6 @@ namespace CinemaManagment.Controllers
 
                 if (showOK || (nextShow && eShow) || privShow)
                 {
-                    Console.WriteLine("blad tworzenia seansu");
                     return RedirectToAction(nameof(Index));
                 }
             }
@@ -142,19 +138,23 @@ namespace CinemaManagment.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,ShowStarts,MovieId,MovieTitle,CinemaHallId")] Show show)
         {
-            var MId = _context.Movie.Where(d => d.Title == show.MovieTitle).FirstOrDefault().Id;
-            show.MovieId = MId;
+            
             if (id != show.Id)
             {
                 return NotFound();
             }
-
+            var MId = _context.Movie.Where(d => d.Title == show.MovieTitle).FirstOrDefault().Id;
+            show.MovieId = MId;
             if (ModelState.IsValid)
             {
                 try
                 {
                     _context.Update(show);
                     await _context.SaveChangesAsync();
+                    if (_context.Show.Where(d => d.CinemaHallId == show.CinemaHallId).Count() == 0)
+                    {
+                        _context.CinemaHall.Where(d => d.Id == show.CinemaHallId).FirstOrDefault().AnyShows = false;
+                    }
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -167,6 +167,7 @@ namespace CinemaManagment.Controllers
                         throw;
                     }
                 }
+                await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             ViewData["CinemaHallId"] = new SelectList(_context.CinemaHall, "Id", "Id", show.CinemaHallId);
@@ -210,6 +211,13 @@ namespace CinemaManagment.Controllers
                 _context.Show.Remove(show);
             }
             
+            await _context.SaveChangesAsync();
+            
+            if (_context.Show.Where(d => d.CinemaHallId == show.CinemaHallId).Count() == 0)
+            {
+                _context.CinemaHall.Where(d => d.Id == show.CinemaHallId).FirstOrDefault().AnyShows = false;
+            }
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
