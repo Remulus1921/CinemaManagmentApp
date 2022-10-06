@@ -13,6 +13,7 @@
         public int NrOfCinemaHall { get; set; }
         public CinemaHall? Hall { get; set; }
         public List<Reservation>? Reservation { get; set; }
+        public List<Seat>? Seats { get; set; }
 
     }
 }

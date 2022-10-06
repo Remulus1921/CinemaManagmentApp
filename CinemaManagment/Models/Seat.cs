@@ -7,7 +7,7 @@
         public bool IsTaken { get; set; }
 
         //Navigation properties
-        public int CinemaHallId { get; set; }
-        public CinemaHall CinemaHall { get; set; }
+        public int ShowId { get; set; }
+        public Show? Show { get; set; }
     }
 }
