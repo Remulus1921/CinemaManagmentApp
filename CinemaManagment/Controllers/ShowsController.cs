@@ -110,6 +110,16 @@ namespace CinemaManagment.Controllers
             {
                 _context.Add(show);
                 await _context.SaveChangesAsync();
+                for (int i = 1; i <= _context.CinemaHall.Where(d => d.Id == show.CinemaHallId).FirstOrDefault().NrOfSeats; i++)
+                {
+                    var seat = new Seat();
+                    seat.SeatNumber = i;
+                    seat.IsTaken = false;
+                    seat.ShowId = show.Id;
+
+                    _context.Seat.Add(seat);
+                    await _context.SaveChangesAsync();
+                }
                 return RedirectToAction(nameof(Index));
             }
             //ViewData["CinemaHallId"] = new SelectList(_context.CinemaHall, "Id", "Id", show.CinemaHallId);
@@ -134,6 +144,7 @@ namespace CinemaManagment.Controllers
                 return NotFound();
             }
             ViewData["CinemaHallId"] = new SelectList(_context.CinemaHall, "Id", "Id", show.CinemaHallId);
+            ViewData["NrOfCinemaHall"] = new SelectList(_context.CinemaHall, "HallNr", "HallNr", show.NrOfCinemaHall);
             ViewData["MovieTitle"] = new SelectList(_context.Movie, "Title", "Title", show.MovieTitle);
             ViewData["MovieId"] = new SelectList(_context.Movie, "Id", "Id", show.MovieId);
             return View(show);
@@ -144,7 +155,7 @@ namespace CinemaManagment.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,ShowStarts,MovieId,MovieTitle,CinemaHallId")] Show show)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,ShowStarts,MovieId,MovieTitle,NrOfCinemaHall,CinemaHallId")] Show show)
         {
             
             if (id != show.Id)
@@ -153,6 +164,10 @@ namespace CinemaManagment.Controllers
             }
             var MId = _context.Movie.Where(d => d.Title == show.MovieTitle).FirstOrDefault().Id;
             show.MovieId = MId;
+
+            var HId = _context.CinemaHall.Where(d => d.HallNr == show.NrOfCinemaHall).FirstOrDefault().Id;
+            show.CinemaHallId = HId;
+
             if (ModelState.IsValid)
             {
                 try
@@ -175,10 +190,53 @@ namespace CinemaManagment.Controllers
                         throw;
                     }
                 }
+
+                await _context.SaveChangesAsync();
+
+                if (_context.Seat.Where(d => d.ShowId == show.Id)
+                    .Count() > _context.CinemaHall
+                    .Where(d => d.Id == show.CinemaHallId)
+                    .FirstOrDefault().NrOfSeats)
+                {
+                    int seats = _context.Seat.Where(d => d.ShowId == show.Id)
+                    .Count() - _context.CinemaHall
+                    .Where(d => d.Id == show.CinemaHallId)
+                    .FirstOrDefault().NrOfSeats;
+
+                    int nrOfTheSeat = _context.Seat.Where(d => d.ShowId == show.Id).Count();
+
+                    for (int i = seats; i > 0; i--)
+                    {
+                        var seatToRemove = _context.Seat.Where(d => d.ShowId == show.Id).Where(d => d.SeatNumber == nrOfTheSeat).FirstOrDefault();
+                        _context.Seat.Remove(seatToRemove);
+                        nrOfTheSeat--;
+                        await _context.SaveChangesAsync();
+                    }
+                }
+                else if(_context.Seat.Where(d => d.ShowId == show.Id)
+                    .Count() < _context.CinemaHall
+                    .Where(d => d.Id == show.CinemaHallId)
+                    .FirstOrDefault().NrOfSeats)
+                {
+                    
+
+                    for (int i = _context.Seat.Where(d => d.ShowId == show.Id).Count() + 1; i <= _context.CinemaHall.Where(d => d.Id == show.CinemaHallId).FirstOrDefault().NrOfSeats; i++)
+                    {
+                        var seat = new Seat();
+                        seat.SeatNumber = i;
+                        seat.ShowId = show.Id;
+                        seat.IsTaken = false;
+
+                        _context.Add(seat);
+                        await _context.SaveChangesAsync();
+                    }
+                }
+
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CinemaHallId"] = new SelectList(_context.CinemaHall, "Id", "Id", show.CinemaHallId);
+            //ViewData["CinemaHallId"] = new SelectList(_context.CinemaHall, "Id", "Id", show.CinemaHallId);
+            ViewData["NrOfCinemaHall"] = new SelectList(_context.CinemaHall, "HallNr", "HallNr", show.NrOfCinemaHall);
             ViewData["MovieTitle"] = new SelectList(_context.Movie, "Title", "Title", show.MovieTitle);
             //ViewData["MovieId"] = new SelectList(_context.Movie, "Id", "Id", show.MovieId);
             return View(show);
@@ -224,6 +282,12 @@ namespace CinemaManagment.Controllers
             if (_context.Show.Where(d => d.CinemaHallId == show.CinemaHallId).Count() == 0)
             {
                 _context.CinemaHall.Where(d => d.Id == show.CinemaHallId).FirstOrDefault().AnyShows = false;
+            }
+
+            foreach (var item in _context.Seat.Where(d => d.ShowId == show.Id))
+            {
+                _context.Seat.Remove(item);
+                await _context.SaveChangesAsync();
             }
 
             await _context.SaveChangesAsync();
