@@ -6,6 +6,7 @@
         public string CreatorId { get; set; }
         public string CreatorFirstName { get; set; }
         public string CreatorLastName { get; set; }
+        public int SeatNr { get; set; }
 
         //Navigation Properties
         public int ShowId { get; set; }
