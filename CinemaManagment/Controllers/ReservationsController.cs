@@ -51,15 +51,25 @@ namespace CinemaManagment.Controllers
         public IActionResult Create()
         {
             ViewData["ShowId"] = new SelectList(_context.Show, "Id", "Id");
+
+            //var seats = _context.Show.Where(d => d.Id == _context.Seat.FirstOrDefault().ShowId);
+            //ViewData["SeatNr"] = new SelectList(seats, "SeatNumber", "SeatNumber");
             return View();
         }
+
+        //[HttpPost]
+        //public async Task<List<Show>> GetPreferenceValues(int id)
+        //{
+        //    var PreferenceValues = _context.Show.Where(p => p.Id == id).ToList();
+        //    return PreferenceValues;
+        //}
 
         // POST: Reservations/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,CreatorId,ShowId")] Reservation reservation)
+        public async Task<IActionResult> Create([Bind("Id,CreatorId,ShowId,SeatNr")] Reservation reservation)
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null)
@@ -67,8 +77,10 @@ namespace CinemaManagment.Controllers
                 throw new ArgumentException("Blad");
             }
             reservation.CreatorId = userId;
-            //if (ModelState.IsValid)
-            
+            reservation.CreatorFirstName = _context.Users.Where(d => d.Id == userId).FirstOrDefault().FirstName;
+            reservation.CreatorLastName = _context.Users.Where(d => d.Id == userId).FirstOrDefault().LastName;
+                //if (ModelState.IsValid)
+
                 _context.Add(reservation);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
