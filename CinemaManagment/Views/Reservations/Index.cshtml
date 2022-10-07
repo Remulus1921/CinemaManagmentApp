@@ -14,10 +14,19 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.CreatorId)
+                First Name
+            </th>
+            <th>
+                Last name
+            </th>
+            <th>
+                Start of the show
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Show)
+            </th>
+            <th>
+                Place number
             </th>
             <th></th>
         </tr>
@@ -26,7 +35,10 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.CreatorId)
+                @Html.DisplayFor(modelItem => item.CreatorFirstName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreatorLastName)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Show.ShowStarts)
