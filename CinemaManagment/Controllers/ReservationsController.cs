@@ -14,6 +14,7 @@ namespace CinemaManagment.Controllers
 {
     public class ReservationsController : Controller
     {
+        private int SN;
         private readonly ApplicationDbContext _context;
         UserManager<IdentityUser> _userManager;
         public ReservationsController(ApplicationDbContext context)
@@ -48,29 +49,24 @@ namespace CinemaManagment.Controllers
         }
 
         // GET: Reservations/Create
-        public IActionResult Create()
+        public IActionResult Create(int id)
         {
-            ViewData["ShowId"] = new SelectList(_context.Show, "Id", "Id");
-
-            //var seats = _context.Show.Where(d => d.Id == _context.Seat.FirstOrDefault().ShowId);
-            //ViewData["SeatNr"] = new SelectList(seats, "SeatNumber", "SeatNumber");
+            if (id == 0)
+            {
+                return NotFound();
+            }
+            ViewData["SeatNr"] = new SelectList(_context.Seat.Where(d => d.ShowId == id && d.IsTaken == false)  , "SeatNumber", "SeatNumber");
+            ViewData["ShowId"] = new SelectList(_context.Show.Where(d => d.Id == id)  , "Id", "Id");
             return View();
+
         }
 
-        //[HttpPost]
-        //public async Task<List<Show>> GetPreferenceValues(int id)
-        //{
-        //    var PreferenceValues = _context.Show.Where(p => p.Id == id).ToList();
-        //    return PreferenceValues;
-        //}
-
-        // POST: Reservations/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,CreatorId,ShowId,SeatNr")] Reservation reservation)
         {
+            SN = reservation.SeatNr;
+            reservation.Id = 0;
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null)
             {
@@ -79,14 +75,12 @@ namespace CinemaManagment.Controllers
             reservation.CreatorId = userId;
             reservation.CreatorFirstName = _context.Users.Where(d => d.Id == userId).FirstOrDefault().FirstName;
             reservation.CreatorLastName = _context.Users.Where(d => d.Id == userId).FirstOrDefault().LastName;
-                //if (ModelState.IsValid)
-
+           
+            _context.Seat.Where(d => d.ShowId == reservation.ShowId && d.SeatNumber == reservation.SeatNr).FirstOrDefault().IsTaken = true;
                 _context.Add(reservation);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
-            
-            //ViewData["ShowId"] = new SelectList(_context.Show, "Id", "Id", reservation.ShowId);
-            //return View(reservation);
+        
         }
 
         // GET: Reservations/Edit/5
@@ -102,7 +96,7 @@ namespace CinemaManagment.Controllers
             {
                 return NotFound();
             }
-            ViewData["ShowId"] = new SelectList(_context.Show, "Id", "Id", reservation.ShowId);
+            ViewData["SeatNr"] = new SelectList(_context.Seat.Where(d => d.ShowId == reservation.ShowId && d.IsTaken == false), "SeatNumber", "SeatNumber", reservation.SeatNr);
             return View(reservation);
         }
 
@@ -111,35 +105,35 @@ namespace CinemaManagment.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,CreatorId,ShowId")] Reservation reservation)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,CreatorId,ShowId,SeatNr")] Reservation reservation)
         {
             if (id != reservation.Id)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            try
             {
-                try
-                {
-                    _context.Update(reservation);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ReservationExists(reservation.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                _context.Update(reservation);
+                await _context.SaveChangesAsync();
             }
-            ViewData["ShowId"] = new SelectList(_context.Show, "Id", "Id", reservation.ShowId);
-            return View(reservation);
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!ReservationExists(reservation.Id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            if (reservation.SeatNr != SN)
+            {
+                _context.Seat.Where(d => d.SeatNumber == SN && d.ShowId == reservation.ShowId).FirstOrDefault().IsTaken = false;
+            }
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Reservations/Delete/5
@@ -171,6 +165,7 @@ namespace CinemaManagment.Controllers
                 return Problem("Entity set 'ApplicationDbContext.Reservation'  is null.");
             }
             var reservation = await _context.Reservation.FindAsync(id);
+            _context.Seat.Where(d => d.ShowId == reservation.ShowId && d.SeatNumber == reservation.SeatNr).FirstOrDefault().IsTaken = false;
             if (reservation != null)
             {
                 _context.Reservation.Remove(reservation);
