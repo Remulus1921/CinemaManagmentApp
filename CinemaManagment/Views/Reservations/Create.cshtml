@@ -13,7 +13,7 @@
     <div class="col-md-4">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
+            <div class="form-group d-none">
                 <label class="control-label">Show Id</label>
                 <select asp-for="ShowId" class ="form-control" asp-items="ViewBag.ShowId"></select>
             </div>

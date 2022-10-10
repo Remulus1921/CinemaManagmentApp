@@ -12,28 +12,34 @@
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CreatorId)
+            Creator Id:
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.CreatorId)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CreatorFirstName)
+            Creator First Name:
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.CreatorFirstName)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CreatorLastName)
+            Creator Last Name:
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.CreatorLastName)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Show)
+            Movie Title:
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Show.Id)
+            @Html.DisplayFor(model => model.Show.MovieTitle)
+        </dd>
+        <dt class = "col-sm-2">
+            Seat Number:
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.SeatNr)
         </dd>
     </dl>
 </div>
