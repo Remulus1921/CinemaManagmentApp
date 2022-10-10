@@ -143,10 +143,10 @@ namespace CinemaManagment.Controllers
             {
                 return NotFound();
             }
-            ViewData["CinemaHallId"] = new SelectList(_context.CinemaHall, "Id", "Id", show.CinemaHallId);
+            //ViewData["CinemaHallId"] = new SelectList(_context.CinemaHall, "Id", "Id", show.CinemaHallId);
             ViewData["NrOfCinemaHall"] = new SelectList(_context.CinemaHall, "HallNr", "HallNr", show.NrOfCinemaHall);
             ViewData["MovieTitle"] = new SelectList(_context.Movie, "Title", "Title", show.MovieTitle);
-            ViewData["MovieId"] = new SelectList(_context.Movie, "Id", "Id", show.MovieId);
+            //ViewData["MovieId"] = new SelectList(_context.Movie, "Id", "Id", show.MovieId);
             return View(show);
         }
 
@@ -292,6 +292,11 @@ namespace CinemaManagment.Controllers
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+        }
+
+        public IActionResult Reservation(int id)
+        {
+            return RedirectToAction("Create", "Reservations", new { id = id });
         }
 
         private bool ShowExists(int id)
