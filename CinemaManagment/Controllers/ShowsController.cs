@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using CinemaManagment.Areas.Identity.Data;
 using CinemaManagment.Models;
 using Microsoft.AspNetCore.Authorization;
-
+    
 namespace CinemaManagment.Controllers
 {
     [Authorize]
