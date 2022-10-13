@@ -2,9 +2,11 @@ using CinemaManagment.Areas.Identity.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
+using CinemaManagment.Areas.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
-var connectionString = builder.Configuration.GetConnectionString("ApplicationDbContextConnection") ?? throw new InvalidOperationException("Connection string 'ApplicationDbContextConnection' not found.");
+var connectionString = builder.Configuration.GetConnectionString("ApplicationDbContextConnection") ?? 
+    throw new InvalidOperationException("Connection string 'ApplicationDbContextConnection' not found.");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
@@ -31,6 +33,21 @@ builder.Services.Configure<IdentityOptions>(options =>
 });
 
 var app = builder.Build();
+
+using(var scope = app.Services.CreateScope())
+{
+    //var appbuild = scope.ServiceProvider.GetService<IApplicationBuilder>();
+    var servPro = scope.ServiceProvider.GetService<UserManager<ApplicationUser>>();
+    var services = scope.ServiceProvider;
+    
+    var context = services.GetRequiredService<ApplicationDbContext>();
+    context.Database.Migrate();
+
+    var seedUserPass = builder.Configuration.GetValue<string>("SeedUserPass");
+    var seedUserPass2 = builder.Configuration.GetValue<string>("SeedUserPass2");
+    await SeedData.CreateRoles(services);
+    await SeedData.Initialize(services, servPro, seedUserPass, seedUserPass2);
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
