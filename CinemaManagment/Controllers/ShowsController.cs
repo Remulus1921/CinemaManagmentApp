@@ -22,12 +22,13 @@ namespace CinemaManagment.Controllers
         }
 
         // GET: Shows
+        [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
             var applicationDbContext = _context.Show.Include(s => s.Hall).Include(s => s.Movie);
             return View(await applicationDbContext.ToListAsync());
         }
-
+        [AllowAnonymous]
         // GET: Shows/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -49,6 +50,7 @@ namespace CinemaManagment.Controllers
         }
 
         // GET: Shows/Create
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             //ViewData["CinemaHallId"] = new SelectList(_context.CinemaHall, "Id", "Id");
@@ -131,6 +133,7 @@ namespace CinemaManagment.Controllers
         }
 
         // GET: Shows/Edit/5
+        [Authorize(Roles = "Admin, Manager")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null || _context.Show == null)
@@ -243,6 +246,7 @@ namespace CinemaManagment.Controllers
         }
 
         // GET: Shows/Delete/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null || _context.Show == null)
