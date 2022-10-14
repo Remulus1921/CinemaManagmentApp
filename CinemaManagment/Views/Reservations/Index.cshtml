@@ -1,4 +1,5 @@
-﻿@model IEnumerable<CinemaManagment.Models.Reservation>
+﻿@using System.Security.Claims
+@model IEnumerable<CinemaManagment.Models.Reservation>
 
 @{
     ViewData["Title"] = "Index";
@@ -29,7 +30,10 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
+@if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+{
+    @foreach (var item in Model)
+    {
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.CreatorFirstName)
@@ -52,6 +56,35 @@
                 <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
             </td>
         </tr>
+    }
+}
+else
+{
+    var Id = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    @foreach (var item in Model.Where(d => d.CreatorId == Id))
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreatorFirstName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreatorLastName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Show.ShowStarts)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Show.MovieTitle)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SeatNr)
+            </td>
+            <td>
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+    }        
 }
     </tbody>
 </table>
