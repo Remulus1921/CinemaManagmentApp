@@ -9,14 +9,16 @@ using CinemaManagment.Areas.Identity.Data;
 using CinemaManagment.Models;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CinemaManagment.Controllers
 {
+    [Authorize]
     public class ReservationsController : Controller
     {
         private int SN;
         private readonly ApplicationDbContext _context;
-        UserManager<IdentityUser> _userManager;
+        UserManager<ApplicationUser> _userManager;
         public ReservationsController(ApplicationDbContext context)
         {
             _context = context;
@@ -84,13 +86,13 @@ namespace CinemaManagment.Controllers
         }
 
         // GET: Reservations/Edit/5
+        [Authorize(Roles = "Admin, Manager")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null || _context.Reservation == null)
             {
                 return NotFound();
             }
-
             var reservation = await _context.Reservation.FindAsync(id);
             if (reservation == null)
             {
@@ -107,11 +109,16 @@ namespace CinemaManagment.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,CreatorId,ShowId,SeatNr")] Reservation reservation)
         {
+            var reser = await _context.Reservation.AsNoTracking().SingleOrDefaultAsync(d => d.Id == id);
             if (id != reservation.Id)
             {
                 return NotFound();
             }
-
+            SN = reser.SeatNr;
+            reservation.CreatorId = reser.CreatorId;
+            reservation.CreatorFirstName = reser.CreatorFirstName;
+            reservation.CreatorLastName = reser.CreatorLastName;
+            reservation.ShowId = reser.ShowId;
             try
             {
                 _context.Update(reservation);
@@ -128,10 +135,12 @@ namespace CinemaManagment.Controllers
                     throw;
                 }
             }
-
             if (reservation.SeatNr != SN)
             {
                 _context.Seat.Where(d => d.SeatNumber == SN && d.ShowId == reservation.ShowId).FirstOrDefault().IsTaken = false;
+                _context.Seat.Where(d => d.SeatNumber == reservation.SeatNr && d.ShowId == reservation.ShowId).FirstOrDefault().IsTaken = true;
+                await _context.SaveChangesAsync();
+
             }
             return RedirectToAction(nameof(Index));
         }
@@ -175,6 +184,10 @@ namespace CinemaManagment.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        public IActionResult Shows(int id)
+        {
+            return RedirectToAction("Index", "Shows");
+        }
         private bool ReservationExists(int id)
         {
           return (_context.Reservation?.Any(e => e.Id == id)).GetValueOrDefault();
