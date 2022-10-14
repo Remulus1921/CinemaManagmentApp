@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace CinemaManagment.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     public class CinemaHallsController : Controller
     {
         private readonly ApplicationDbContext _context;
