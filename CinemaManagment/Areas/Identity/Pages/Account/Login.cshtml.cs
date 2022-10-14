@@ -116,7 +116,7 @@ namespace CinemaManagment.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");
-                    return LocalRedirect(returnUrl);
+                    return LocalRedirect("/Shows/Index");
                 }
                 if (result.RequiresTwoFactor)
                 {
