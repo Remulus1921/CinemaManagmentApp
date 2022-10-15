@@ -36,7 +36,6 @@ var app = builder.Build();
 
 using(var scope = app.Services.CreateScope())
 {
-    //var appbuild = scope.ServiceProvider.GetService<IApplicationBuilder>();
     var servPro = scope.ServiceProvider.GetService<UserManager<ApplicationUser>>();
     var services = scope.ServiceProvider;
     
@@ -67,7 +66,7 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Shows}/{action=Index}/{id?}");
 app.MapRazorPages();
 
 app.Run();
